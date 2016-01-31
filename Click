@@ -2,33 +2,38 @@
 
 static Window *window;
 static TextLayer *layer;
+static TextLayer *layer1;
 
 int level = 1; 
-
-
 
 void up_click_handler(ClickRecognizerRef recognizer, void *context)
 {
   if(level <= 2)
     level += 1;
   if(level == 1)
-    text_layer_set_text(layer, "Current Safety level: Secure/Safe");
+    {
+      
+      text_layer_set_text(layer1, "SAFE");
+    }
+    
   if(level == 2)
-    text_layer_set_text(layer, "Current Safety level: In an uncomfortable worrying situation");
+    {
+      text_layer_set_text(layer1, "ALERT");
+    }
   if(level == 3)
-    text_layer_set_text(layer, "Current Safety level: Evident threat");
+    text_layer_set_text(layer1, "THREAT");
   
 }
 
 static void select_long_click_handler(ClickRecognizerRef recognizer, void *context)
 {
-  text_layer_set_text(layer, "Current Safety level: Emergency, text 911 please");
+  text_layer_set_text(layer1, "911");
   level = 4;
 }
 
 static void select_long_click_release_handler(ClickRecognizerRef recognizer, void *context)
 {
-  text_layer_set_text(layer, "Current Safety level: Emergency, text 911 please");
+  text_layer_set_text(layer1, "911");
   level = 4;
 } 
 
@@ -37,13 +42,11 @@ static void down_click_handler(ClickRecognizerRef recognizer, void *context)
   if(level >= 2)
     level -= 1;
   if(level == 1)
-    text_layer_set_text(layer, "Current Safety level: Secure/Safe");
+    text_layer_set_text(layer1, "SAFE");
   if(level == 2)
-    text_layer_set_text(layer, "Current Safety level: In an uncomfortable worrying situation");
+    text_layer_set_text(layer1, "UNEASY");
   if(level == 3)
-    text_layer_set_text(layer, "Current Safety level: Evident threat");
-  if(level == 4)
-    text_layer_set_text(layer, "Current Safety level: Emergency, text 911 please");
+    text_layer_set_text(layer1, "THREAT");
 }
 
 static void click_config_provider(void *context)
@@ -61,10 +64,18 @@ static void window_load(Window *window)
   GRect window_bounds = layer_get_bounds(window_layer);
   
   layer = text_layer_create(GRect(5, 0, window_bounds.size.w - 5, window_bounds.size.h));
-  text_layer_set_font(layer, fonts_get_system_font(FONT_KEY_GOTHIC_24));
-  text_layer_set_text(layer, "Current Safety level: Secure/Safe");
+  text_layer_set_font(layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
+  text_layer_set_text(layer, "Current Safety level:");
+  text_layer_set_text_alignment(layer, GTextAlignmentCenter);
   text_layer_set_overflow_mode(layer, GTextOverflowModeWordWrap);
   layer_add_child(window_layer, text_layer_get_layer(layer));
+  
+  layer1 = text_layer_create(GRect(5, 75, window_bounds.size.w - 5, window_bounds.size.h));
+  text_layer_set_font(layer1, fonts_get_system_font(FONT_KEY_BITHAM_30_BLACK));
+  text_layer_set_text(layer1, "SAFE");
+  text_layer_set_text_alignment(layer1, GTextAlignmentCenter);
+  text_layer_set_overflow_mode(layer1, GTextOverflowModeWordWrap);
+  layer_add_child(window_layer, text_layer_get_layer(layer1));
 }
 
 void window_unload(Window *window)
@@ -75,24 +86,24 @@ void window_unload(Window *window)
 
 static void init()
 {
-	window = window_create();
-	window_set_window_handlers(window, (WindowHandlers)
-	{
-		.load = window_load,
-		.unload = window_unload
-	});	
+  window = window_create();
+  window_set_window_handlers(window, (WindowHandlers)
+  {
+    .load = window_load,
+    .unload = window_unload
+  }); 
   window_set_click_config_provider(window, click_config_provider);
   window_stack_push(window, true);
 }
 
 static void deinit()
 {
-	window_destroy(window);
+  window_destroy(window);
 }
 
 int main(void)
 {
-	init();
-	app_event_loop();
-	deinit();
+  init();
+  app_event_loop();
+  deinit();
 }
